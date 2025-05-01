@@ -3,22 +3,23 @@ package main
 import (
 	"fmt"
 	"gator/internal/config"
+	"log"
 )
 
 const configFileName = ".gatorconfig.json"
 
 func main() {
-	cfg, err := config.Read(configFileName)
+	cfg, err := config.Read()
 	if err != nil {
-		panic(err)
+		log.Fatalf("error reading config: %v", err)
 	}
+	fmt.Printf("Read config: %+v\n", cfg)
 
-	cfg.SetUser("lane")
+	err = cfg.SetUser("lane")
 
-	cfg, err = config.Read(configFileName)
+	cfg, err = config.Read()
 	if err != nil {
-		panic(err)
+		log.Fatalf("error reading config: %v", err)
 	}
-
-	fmt.Println(cfg)
+	fmt.Printf("Read config again: %+v\n", cfg)
 }
