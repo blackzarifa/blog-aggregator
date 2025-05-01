@@ -32,3 +32,14 @@ func Read(filename string) (*Config, error) {
 
 	return &config, nil
 }
+
+func (c *Config) SetUser(username string) error {
+	c.CurrentUserName = username
+
+	data, err := json.MarshalIndent(c, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(c.configPath, data, 0600)
+}
