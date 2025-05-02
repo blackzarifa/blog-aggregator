@@ -8,8 +8,6 @@ import (
 	"os"
 )
 
-const configFileName = ".gatorconfig.json"
-
 type state struct {
 	cfg *config.Config
 }
