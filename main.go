@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-	"fmt"
 	"gator/internal/config"
 	"log"
 	"os"
@@ -39,21 +37,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func handlerLogin(s *state, cmd command) error {
-	if len(cmd.Args) < 1 {
-		return errors.New(
-			"the login handler expects a single argument, the username",
-		)
-	}
-
-	err := s.cfg.SetUser(cmd.Args[0])
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("The user %s has been set.\n", cmd.Args[0])
-	return nil
-
 }
