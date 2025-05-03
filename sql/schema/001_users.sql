@@ -3,7 +3,7 @@ CREATE TABLE users (
     id integer primary key,
     created_at timestamp not null,
     updated_at timestamp not null,
-    name string not null
+    name text unique not null
 );
 
 -- +goose Down
