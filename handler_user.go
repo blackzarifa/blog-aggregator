@@ -61,3 +61,14 @@ func handlerLogin(s *state, cmd command) error {
 	fmt.Println("User switched successfully!")
 	return nil
 }
+
+func handlerReset(s *state, cmd command) error {
+	ctx := context.Background()
+	err := s.db.DeleteAllUsers(ctx)
+	if err != nil {
+		return fmt.Errorf("couldn't delete all users: %w", err)
+	}
+
+	fmt.Println("Deleted all users successfully!")
+	return nil
+}
