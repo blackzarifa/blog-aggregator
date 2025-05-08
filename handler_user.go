@@ -72,3 +72,7 @@ func handlerReset(s *state, cmd command) error {
 	fmt.Println("Deleted all users successfully!")
 	return nil
 }
+
+func handlerUsers(s *state, cmd command) error {
+	return nil
+}
