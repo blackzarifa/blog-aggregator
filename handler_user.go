@@ -82,11 +82,8 @@ func handlerUsers(s *state, cmd command) error {
 
 	for _, user := range users {
 		currentStr := ""
-		currentUser, err := s.db.GetUser(ctx, user.Name)
-		if err != nil {
-			return fmt.Errorf("error looking up users: %w", err)
-		}
-		if currentUser.Name == user.Name {
+
+		if s.cfg.CurrentUserName == user.Name {
 			currentStr = " (current)"
 		}
 
