@@ -73,7 +73,7 @@ func handlerReset(s *state, cmd command) error {
 	return nil
 }
 
-func handlerUsers(s *state, cmd command) error {
+func handlerListUsers(s *state, cmd command) error {
 	ctx := context.Background()
 	users, err := s.db.GetUsers(ctx)
 	if err != nil {
@@ -82,7 +82,6 @@ func handlerUsers(s *state, cmd command) error {
 
 	for _, user := range users {
 		currentStr := ""
-
 		if s.cfg.CurrentUserName == user.Name {
 			currentStr = " (current)"
 		}
