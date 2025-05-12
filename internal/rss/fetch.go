@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
+	"html"
 	"io"
 	"net/http"
 	"time"
@@ -49,6 +50,20 @@ func FetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	var feed RSSFeed
 	if err := xml.Unmarshal(body, &feed); err != nil {
 		return nil, fmt.Errorf("error parsing XML feed: %w", err)
+	}
+
+	// Unescape HTML entities in channel fields
+	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
+	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
+
+	// Unescape HTML entities in item fields
+	for i := range feed.Channel.Item {
+		feed.Channel.Item[i].Title = html.UnescapeString(
+			feed.Channel.Item[i].Title,
+		)
+		feed.Channel.Item[i].Description = html.UnescapeString(
+			feed.Channel.Item[i].Description,
+		)
 	}
 
 	return &feed, nil
