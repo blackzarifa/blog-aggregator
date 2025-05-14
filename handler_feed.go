@@ -53,6 +53,7 @@ func handlerPrintFeeds(s *state, cmd command) error {
 
 	for _, feed := range feeds {
 		printFeed(feed)
+		fmt.Println("=====================================")
 	}
 
 	return nil
