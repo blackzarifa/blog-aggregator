@@ -32,6 +32,7 @@ func handlerFollowFeed(s *state, cmd command) error {
 	}
 
 	url := cmd.Args[0]
+
 	if s.cfg.CurrentUserName == "" {
 		return fmt.Errorf("no user is logged in")
 	}
@@ -58,6 +59,36 @@ func handlerFollowFeed(s *state, cmd command) error {
 		feedFollow.UserName,
 		feedFollow.FeedName,
 	)
+	return nil
+}
+
+func handlerFollowingFeeds(s *state, cmd command) error {
+	if s.cfg.CurrentUserName == "" {
+		return fmt.Errorf("no user is logged in")
+	}
+
+	ctx := context.Background()
+	user, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
+	if err != nil {
+		return fmt.Errorf("error getting current user: %w", err)
+	}
+
+	feedFollows, err := s.db.GetFeedFollowsForUser(ctx, user.ID)
+	if err != nil {
+		return fmt.Errorf("error retrieving followed feeds: %w", err)
+	}
+
+	if len(feedFollows) == 0 {
+		fmt.Println("You are not following any feeds.")
+		return nil
+	}
+
+	fmt.Printf("Feeds followed by %s:\n", s.cfg.CurrentUserName)
+	fmt.Println("------------------------------")
+	for _, ff := range feedFollows {
+		fmt.Printf("* %s\n", ff.FeedName)
+	}
+
 	return nil
 }
 
