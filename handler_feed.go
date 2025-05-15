@@ -9,6 +9,58 @@ import (
 	"github.com/google/uuid"
 )
 
+func createFeedFollow(
+	s *state,
+	userID, feedID uuid.UUID,
+) (database.CreateFeedFollowRow, error) {
+	now := time.Now().UTC()
+	return s.db.CreateFeedFollow(
+		context.Background(),
+		database.CreateFeedFollowParams{
+			ID:        uuid.New(),
+			CreatedAt: now,
+			UpdatedAt: now,
+			UserID:    userID,
+			FeedID:    feedID,
+		},
+	)
+}
+
+func handlerFollowFeed(s *state, cmd command) error {
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("usage: %s <feed_url>", cmd.Name)
+	}
+
+	url := cmd.Args[0]
+	if s.cfg.CurrentUserName == "" {
+		return fmt.Errorf("no user is logged in")
+	}
+
+	ctx := context.Background()
+
+	user, err := s.db.GetUser(ctx, s.cfg.CurrentUserName)
+	if err != nil {
+		return fmt.Errorf("error getting current user: %w", err)
+	}
+
+	feed, err := s.db.GetFeedByURL(ctx, url)
+	if err != nil {
+		return fmt.Errorf("feed not found with URL %s: %w", url, err)
+	}
+
+	feedFollow, err := createFeedFollow(s, user.ID, feed.ID)
+	if err != nil {
+		return fmt.Errorf("error following feed: %w", err)
+	}
+
+	fmt.Printf(
+		"User %s is now following feed: %s\n",
+		feedFollow.UserName,
+		feedFollow.FeedName,
+	)
+	return nil
+}
+
 func handlerAddFeed(s *state, cmd command) error {
 	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
 	if err != nil {
@@ -39,8 +91,14 @@ func handlerAddFeed(s *state, cmd command) error {
 
 	fmt.Println("Feed created successfully:")
 	printFeed(feed)
-	fmt.Println()
-	fmt.Println("=====================================")
+
+	// Automatically create a feed follow for the current user
+	feedFollow, err := createFeedFollow(s, user.ID, feed.ID)
+	if err != nil {
+		fmt.Printf("Warning: Could not automatically follow feed: %v\n", err)
+	} else {
+		fmt.Printf("User %s is now following feed: %s\n", feedFollow.UserName, feedFollow.FeedName)
+	}
 
 	return nil
 }
