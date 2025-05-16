@@ -9,6 +9,36 @@ import (
 	"github.com/google/uuid"
 )
 
+func handlerUnfollow(s *state, cmd command, user database.User) error {
+	if len(cmd.Args) < 1 {
+
+		return fmt.Errorf("usage: %s <feed_url>", cmd.Name)
+	}
+
+	feedUrl := cmd.Args[0]
+
+	feed, err := s.db.GetFeedByURL(context.Background(), feedUrl)
+	if err != nil {
+
+		return fmt.Errorf("error finding feed: %w", err)
+	}
+
+	err = s.db.DeleteFeedFollow(
+		context.Background(),
+		database.DeleteFeedFollowParams{
+			UserID: user.ID,
+			Url:    feed.Url,
+		},
+	)
+	if err != nil {
+
+		return fmt.Errorf("error unfollow feed: %w", err)
+	}
+
+	fmt.Printf("Successfully unfollowed feed: %s\n", feedUrl)
+	return nil
+}
+
 func handlerFollow(s *state, cmd command, user database.User) error {
 
 	if len(cmd.Args) != 1 {
