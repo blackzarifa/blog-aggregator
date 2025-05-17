@@ -24,8 +24,5 @@ WHERE ff.user_id = $1
 ORDER BY f.name ASC;
 
 -- name: DeleteFeedFollow :exec
-DELETE FROM feed_follows ff
-WHERE ff.user_id = $1 AND ff.feed_id = (
-  SELECT id FROM feeds WHERE url = $2
-);
+DELETE FROM feed_follows WHERE feed_id = $1 AND user_id = $2;
 
